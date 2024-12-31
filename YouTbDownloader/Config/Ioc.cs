@@ -11,6 +11,7 @@ public class Ioc
         var serviceProvider = new ServiceCollection()
             .AddTransient<Application>()
             .AddTransient<ISetupLibrary, YtDlp>()
+            .AddTransient<ICommandExecute, CommandExecute>()
             .BuildServiceProvider();
 
         return serviceProvider;
