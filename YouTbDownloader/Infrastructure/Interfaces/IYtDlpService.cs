@@ -1,7 +1,8 @@
 namespace YouTbDownloader;
 
-public interface ISetupLibrary
+public interface IYtDlpService
 {
     Task<string> DownloadAndSetup();
     Task<string> DownloadFfMgeg();
+    Task<string> GetVideoTitle(string urlVideo);
 }

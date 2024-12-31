@@ -1,11 +1,13 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 
 namespace YouTbDownloader.Infrastructure;
 
-public class YtDlp : ISetupLibrary
+public class YtDlp : IYtDlpService
 {
     private readonly ICommandExecute _commandExecute;
+    private string _ytDlpPath;
 
     public YtDlp(ICommandExecute commandExecute)
     {
@@ -21,6 +23,7 @@ public class YtDlp : ISetupLibrary
         if (File.Exists(targetPath))
         {
             GrantedPermission(targetPath);
+            _ytDlpPath = targetPath;
             return targetPath;
         }
         
@@ -85,6 +88,20 @@ public class YtDlp : ISetupLibrary
         File.Delete(tmpFile);
 
         return ffmpegDir;
+    }
+
+    public async Task<string> GetVideoTitle(string urlVideo)
+    {
+        var command = $"{_ytDlpPath} --dump-json {urlVideo}";
+        var (output, _, exitCode)  = await _commandExecute.RunCommand(command);
+
+        if (exitCode != 0)
+            throw new Exception("Falha ao obter informações do vídeo");
+        using var doc = JsonDocument.Parse(output);
+        var root = doc.RootElement;
+        var title = root.GetProperty("title").GetString();
+
+        return title;
     }
 
     private void GrantedPermission(string targetPath)
