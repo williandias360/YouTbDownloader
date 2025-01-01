@@ -92,16 +92,19 @@ public class YtDlp : IYtDlpService
 
     public async Task<string> GetVideoTitle(string urlVideo)
     {
-        var command = $"{_ytDlpPath} --dump-json {urlVideo}";
+        var command = $"{_ytDlpPath} --print title {urlVideo}";
         var (output, _, exitCode)  = await _commandExecute.RunCommand(command);
 
         if (exitCode != 0)
             throw new Exception("Falha ao obter informações do vídeo");
-        using var doc = JsonDocument.Parse(output);
-        var root = doc.RootElement;
-        var title = root.GetProperty("title").GetString();
 
-        return title;
+        if (!string.IsNullOrEmpty(output)) 
+            return output.Replace("\n", "");
+        
+        command = $"{_ytDlpPath} --dump-json {urlVideo}";
+        (output, _, _) = await _commandExecute.RunCommand(command);
+
+        return output;
     }
 
     private void GrantedPermission(string targetPath)
