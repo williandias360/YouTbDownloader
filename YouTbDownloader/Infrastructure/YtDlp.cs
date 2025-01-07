@@ -90,9 +90,9 @@ public class YtDlp : IYtDlpService
         return ffmpegDir;
     }
 
-    public async Task<string> GetVideoTitle(string urlVideo)
+    public async Task<string> GetVideoTitle(string pathYtDlp, string urlVideo)
     {
-        var command = $"{_ytDlpPath} --print title {urlVideo}";
+        var command = $"{pathYtDlp} --print title {urlVideo}";
         var (output, _, exitCode)  = await _commandExecute.RunCommand(command);
 
         if (exitCode != 0)
