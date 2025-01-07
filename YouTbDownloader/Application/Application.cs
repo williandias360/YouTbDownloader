@@ -1,9 +1,12 @@
-using System.Diagnostics;
-using System.Runtime.InteropServices;
+using System.Globalization;
+using System.Text;
+using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
+using YouTbDownloader.Config;
 
 namespace YouTbDownloader.application;
 
-public class Application
+public partial class Application
 {
     private readonly IYtDlpService _ytDlpService;
     private readonly ICommandExecute _commandExecute;
@@ -20,17 +23,16 @@ public class Application
         try
         {
             Console.WriteLine("Inicializando ambiente");
-            var path = await _ytDlpService.DownloadAndSetup();
+            var pathYtDlp = await _ytDlpService.DownloadAndSetup();
             var pathffmpeg = await _ytDlpService.DownloadFfMgeg();
             var outputPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), APP_NAME);
-            
+
             if (!Directory.Exists(outputPath))
                 Directory.CreateDirectory(outputPath);
 
             var listaUrls = new[]
             {
                 "https://music.youtube.com/watch?v=uP0wu72r9y4&si=UFs_mmdRsT136YU1",
-                "https://music.youtube.com/watch?v=LuSkCkeMGdI&si=ddWluejKjqT0jAnX",
                 "https://music.youtube.com/watch?v=LuSkCkeMGdI&si=ddWluejKjqT0jAnX",
                 "https://music.youtube.com/watch?v=NDfNe0qh9w0&si=_esOlUbTn1MPQ08c",
                 "https://music.youtube.com/watch?v=D7f49tv48vM&si=eUjfvjr_GF02UW64",
@@ -88,45 +90,84 @@ public class Application
                 "https://music.youtube.com/watch?v=R_hyZ6Z0VNQ&si=F2cNiC8W3zaA5yDA",
                 "https://music.youtube.com/watch?v=CkCErOkKtqs&si=W9Eg5GtiT4XApqGs",
                 "https://music.youtube.com/watch?v=-XlcMU66lzw&si=3fteI5G2S_ay5S7M",
-                "https://music.youtube.com/watch?v=q4zpp00SYQI&si=flO3MZgduHkULESR",
+                "https://music.youtube.com/watch?v=q4zpp00SYQI&si=flO3MZgduHkULESR",//aqui
                 "https://music.youtube.com/watch?v=A-5Ri8aCfGE&si=8UkOTwdEi3OZJVtG",
                 "https://music.youtube.com/watch?v=CC-6eL-fYbQ&si=M3mc5l7LbAyROLWL",
                 "https://music.youtube.com/watch?v=weHDtD44jjY&si=FnNyMaTYeD9KHUME",
                 "https://music.youtube.com/watch?v=Nnnfzx6dR1E&si=Tn7aBfoerg4mqeCj",
             };
 
+            var listaTasks = new List<Task>();
+            var semaphore = new SemaphoreSlim(10);
             foreach (var videoUrl in listaUrls)
             {
-                Console.WriteLine("Obtendo informações do vídeo");
-                var titulo = await _ytDlpService.GetVideoTitle(videoUrl);
-                Console.WriteLine($"Baixando vídeo {titulo}");
-                
-                var guid = Guid.NewGuid();
-                var completePath = $"{outputPath}/{guid}.mp3";
-                var command = $"{path} --ffmpeg-location {pathffmpeg} -x --audio-format mp3 -o \"{completePath}\" {videoUrl}";
-                var (outuput, error, exitCode) = await _commandExecute.RunCommand(command);
-                
-                if (exitCode != 0)
+                var task = Task.Run(async () =>
                 {
-                    if(!string.IsNullOrEmpty(error))
-                        Console.WriteLine($"Error: {error}");
-                    
-                    Console.WriteLine($"O comando falhou com código de saída {exitCode}");
-                    continue;
-                }
+                    try
+                    {
+                        await semaphore.WaitAsync();
+                        Console.WriteLine("Obtendo informações do vídeo");
+                        
+                        var titulo = await _ytDlpService.GetVideoTitle(pathYtDlp, videoUrl);
+                        Console.WriteLine($"Baixando vídeo {titulo}");
 
-                var newName = Path.Combine(outputPath, $"{titulo.Replace("\"", "").Replace("'", " ")}.mp3");
-                var commandRename = $"mv {completePath} '{newName}'";
-                await _commandExecute.RunCommand(commandRename);
-            
-                Console.WriteLine($"Áudio salvo em: {outputPath}");
+                        var guid = Guid.NewGuid();
+                        var completePath = $"{outputPath}/{guid}.mp3";
+                        var command =
+                            $"{pathYtDlp} --ffmpeg-location {pathffmpeg} -x --audio-format mp3 -o \"{completePath}\" {videoUrl}";
+                        var (_, error, exitCode) = await _commandExecute.RunCommand(command);
+
+                        if (exitCode != 0)
+                        {
+                            if (!string.IsNullOrEmpty(error))
+                                Console.WriteLine($"Error: {error}");
+
+                            Console.WriteLine($"O comando falhou com código de saída {exitCode}");
+                            return;
+                        }
+                        
+                        var newName = Path.Combine(outputPath, $"{NormalizeString(titulo)}.mp3");
+                        var commandRename = $"mv {completePath} '{newName}'";
+                        await _commandExecute.RunCommand(commandRename);
+
+                        Console.WriteLine($"Áudio salvo em: {outputPath}");
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                        throw;
+                    }
+                    finally
+                    {
+                        semaphore.Release();
+                    }
+                });
+
+                listaTasks.Add(task);
             }
-            
+
+            Task.WaitAll(listaTasks.ToArray());
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Erro: {ex.Message}");
         }
-        
     }
+
+    private string NormalizeString(string texto)
+    {
+        var sanitized = MyRegex().Replace(texto, " ");
+        var normalized = sanitized.Normalize(NormalizationForm.FormD);
+        var result = new StringBuilder();
+
+        foreach (var letter in normalized.Where(letter => CharUnicodeInfo.GetUnicodeCategory(letter) != UnicodeCategory.NonSpacingMark))
+        {
+            result.Append(letter);
+        }
+
+        return result.ToString().Normalize(NormalizationForm.FormC);
+    }
+
+    [GeneratedRegex(@"[\\\""'\|/]")]
+    private static partial Regex MyRegex();
 }

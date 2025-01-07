@@ -5,12 +5,11 @@ namespace YouTbDownloader.Infrastructure;
 
 public class CommandExecute : ICommandExecute
 {
-    public Task<(string output, string error, int exitCode)> RunCommand(string command)
+    public async Task<(string output, string error, int exitCode)> RunCommand(string command)
     {
-        Console.WriteLine($"Executando comando {command}");
-        var process = new Process()
+        var process = new Process
         {
-            StartInfo = new ProcessStartInfo()
+            StartInfo = new ProcessStartInfo
             {
                 FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "cmd" : "bash",
                 Arguments = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? $"/c {command}" : $"-c \"{command}\"",
@@ -22,9 +21,9 @@ public class CommandExecute : ICommandExecute
         };
 
         process.Start();
-        var output =  process.StandardOutput.ReadToEnd();
-        var error =  process.StandardError.ReadToEnd();
-        process.WaitForExit();
-        return Task.FromResult((output, error, process.ExitCode));
+        var output =  await process.StandardOutput.ReadToEndAsync();
+        var error =  await process.StandardError.ReadToEndAsync();
+        await process.WaitForExitAsync();
+        return (output, error, process.ExitCode);
     }
 }

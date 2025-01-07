@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("YouTbDownloader")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+efe34798bd51681165b31fec6b2ea2f19b52cab9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+11b698b0ccb962fd53dbb061dde458d39a5df15a")]
 [assembly: System.Reflection.AssemblyProductAttribute("YouTbDownloader")]
 [assembly: System.Reflection.AssemblyTitleAttribute("YouTbDownloader")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

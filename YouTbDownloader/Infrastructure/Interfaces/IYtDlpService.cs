@@ -4,5 +4,5 @@ public interface IYtDlpService
 {
     Task<string> DownloadAndSetup();
     Task<string> DownloadFfMgeg();
-    Task<string> GetVideoTitle(string urlVideo);
+    Task<string> GetVideoTitle(string pathYtDlp, string urlVideo);
 }

@@ -16,4 +16,14 @@ public class Ioc
 
         return serviceProvider;
     }
+
+    public static IServiceProvider Create()
+    {
+        var serviceProvider = new ServiceCollection()
+            .AddScoped<IYtDlpService, YtDlp>()
+            .AddScoped<ICommandExecute, CommandExecute>()
+            .BuildServiceProvider();
+
+        return serviceProvider;
+    }
 }
