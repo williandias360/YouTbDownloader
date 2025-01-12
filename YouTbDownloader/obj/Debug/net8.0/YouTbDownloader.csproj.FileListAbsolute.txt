@@ -10,7 +10,8 @@
 /home/willian/dev/YouTbDownloader/YouTbDownloader/obj/Debug/net8.0/YouTbDownloader.AssemblyInfoInputs.cache
 /home/willian/dev/YouTbDownloader/YouTbDownloader/obj/Debug/net8.0/YouTbDownloader.AssemblyInfo.cs
 /home/willian/dev/YouTbDownloader/YouTbDownloader/obj/Debug/net8.0/YouTbDownloader.csproj.CoreCompileInputs.cache
-/home/willian/dev/YouTbDownloader/YouTbDownloader/obj/Debug/net8.0/YouTbDownloader.csproj.CopyComplete
+/home/willian/dev/YouTbDownloader/YouTbDownloader/obj/Debug/net8.0/YouTbDownloader.sourcelink.json
+/home/willian/dev/YouTbDownloader/YouTbDownloader/obj/Debug/net8.0/YouTbDow.B9C91FD2.Up2Date
 /home/willian/dev/YouTbDownloader/YouTbDownloader/obj/Debug/net8.0/YouTbDownloader.dll
 /home/willian/dev/YouTbDownloader/YouTbDownloader/obj/Debug/net8.0/refint/YouTbDownloader.dll
 /home/willian/dev/YouTbDownloader/YouTbDownloader/obj/Debug/net8.0/YouTbDownloader.pdb

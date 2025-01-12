@@ -2,6 +2,18 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouTbDownloader", "YouTbDownloader\YouTbDownloader.csproj", "{831E51FF-8F27-45C2-A9EA-E85D69C0C527}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02 - Conversor", "02 - Conversor", "{6742FD89-2884-4140-9896-FC490B8286C0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouTbDownloader.Conversor.Application", "YouTbDownloader.Conversor.Application\YouTbDownloader.Conversor.Application.csproj", "{ED080D58-0914-49D5-B2C5-4C0390DAE001}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "95 - Shared", "95 - Shared", "{B28E5D0C-55EA-4848-95DA-D14BAD17DE11}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouTbDownloader.Conversor.Entities", "YouTbDownloader.Conversor.Entities\YouTbDownloader.Conversor.Entities.csproj", "{B8B23FE2-38E5-4128-862A-A43329697278}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouTbDownloader.Shared.infrastructure", "YouTbDownloader.Shared.infrastructure\YouTbDownloader.Shared.infrastructure.csproj", "{83583799-F981-4E4D-8DE7-0C03380709F7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 - UI", "01 - UI", "{EEBB1E48-6614-434C-A04C-A56EF354EB8B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +24,23 @@ Global
 		{831E51FF-8F27-45C2-A9EA-E85D69C0C527}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{831E51FF-8F27-45C2-A9EA-E85D69C0C527}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{831E51FF-8F27-45C2-A9EA-E85D69C0C527}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED080D58-0914-49D5-B2C5-4C0390DAE001}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED080D58-0914-49D5-B2C5-4C0390DAE001}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED080D58-0914-49D5-B2C5-4C0390DAE001}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED080D58-0914-49D5-B2C5-4C0390DAE001}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8B23FE2-38E5-4128-862A-A43329697278}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8B23FE2-38E5-4128-862A-A43329697278}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8B23FE2-38E5-4128-862A-A43329697278}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8B23FE2-38E5-4128-862A-A43329697278}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83583799-F981-4E4D-8DE7-0C03380709F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83583799-F981-4E4D-8DE7-0C03380709F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83583799-F981-4E4D-8DE7-0C03380709F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83583799-F981-4E4D-8DE7-0C03380709F7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{ED080D58-0914-49D5-B2C5-4C0390DAE001} = {6742FD89-2884-4140-9896-FC490B8286C0}
+		{B8B23FE2-38E5-4128-862A-A43329697278} = {6742FD89-2884-4140-9896-FC490B8286C0}
+		{83583799-F981-4E4D-8DE7-0C03380709F7} = {B28E5D0C-55EA-4848-95DA-D14BAD17DE11}
+		{831E51FF-8F27-45C2-A9EA-E85D69C0C527} = {EEBB1E48-6614-434C-A04C-A56EF354EB8B}
 	EndGlobalSection
 EndGlobal
