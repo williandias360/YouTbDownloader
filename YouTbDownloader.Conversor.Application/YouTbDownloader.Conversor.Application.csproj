@@ -7,6 +7,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Squid-Box.SevenZipSharp" Version="1.6.2.24" />
+    </ItemGroup>
+
+    <ItemGroup>
       <ProjectReference Include="..\YouTbDownloader.Conversor.Entities\YouTbDownloader.Conversor.Entities.csproj" />
       <ProjectReference Include="..\YouTbDownloader.Shared.infrastructure\YouTbDownloader.Shared.infrastructure.csproj" />
     </ItemGroup>

@@ -1,13 +1,14 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using YouTbDownloader.Conversor.Entities.Interfaces;
 
 namespace YouTbDownloader.Infrastructure;
 
 public class CommandExecute : ICommandExecute
 {
-    public async Task<(string output, string error, int exitCode)> RunCommand(string command)
+    public (string output, string error, int exitCode) RunCommand(string command)
     {
-        var process = new Process
+        using var process = new Process
         {
             StartInfo = new ProcessStartInfo
             {
@@ -16,14 +17,17 @@ public class CommandExecute : ICommandExecute
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
-                CreateNoWindow = true
+                CreateNoWindow = true,
+                StandardOutputEncoding = System.Text.Encoding.Latin1,
+                StandardErrorEncoding = System.Text.Encoding.Latin1,
             }
         };
 
         process.Start();
-        var output =  await process.StandardOutput.ReadToEndAsync();
-        var error =  await process.StandardError.ReadToEndAsync();
-        await process.WaitForExitAsync();
+        var output = process.StandardOutput.ReadToEnd();
+        var error = process.StandardError.ReadToEnd();
+        process.WaitForExit();
+
         return (output, error, process.ExitCode);
     }
 }

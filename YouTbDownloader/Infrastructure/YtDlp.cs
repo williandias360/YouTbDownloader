@@ -1,22 +1,18 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using YouTbDownloader.Conversor.Entities.Interfaces;
 
 namespace YouTbDownloader.Infrastructure;
 
-public class YtDlp : IYtDlpService
+public class YtDlp(ICommandExecute _commandExecute, IFFmpeg _ffMpeg) : IYtDlpService
 {
-    private readonly ICommandExecute _commandExecute;
-    private string _ytDlpPath;
+    private string? _ytDlpPath;
 
-    public YtDlp(ICommandExecute commandExecute)
+    public string DownloadAndSetup()
     {
-        _commandExecute = commandExecute;
-    }
-
-    public async Task<string> DownloadAndSetup()
-    {
-        var downloadUrl = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp";
+        var plataforma = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "yt-dlp.exe" : "yt-dlp";
+        var downloadUrl = $"https://github.com/yt-dlp/yt-dlp/releases/latest/download/{plataforma}";
         var filename = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "yt-dlp.exe" : "yt-dlp";
         var targetPath = Path.Combine(Environment.CurrentDirectory, filename);
 
@@ -32,68 +28,25 @@ public class YtDlp : IYtDlpService
         var response = httpClient.Send(requestMessage);
         response.EnsureSuccessStatusCode();
 
-        await using var fs = new FileStream(targetPath, FileMode.Create, FileAccess.Write);
-        await response.Content.CopyToAsync(fs);
+        using var fs = new FileStream(targetPath, FileMode.Create, FileAccess.Write);
+        response.Content.CopyTo(fs, null, default);
             
         GrantedPermission(targetPath);
 
         return targetPath;
     }
 
-    public async Task<string> DownloadFfMgeg()
+    public string DownloadFfMgeg()
     {
-        var currentDirectory = Directory.GetCurrentDirectory();
-        var ffmpegDir = Path.Combine(currentDirectory, "ffmpegDir");
-        const string ffmpegUrl = "https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz";
-
-        if (Directory.Exists(ffmpegDir)) 
-            return ffmpegDir;
-        
-        var tmpFile = Path.Combine(ffmpegDir, "ffmpeg.tar.xz");
-        Directory.CreateDirectory(ffmpegDir);
-
-        if (!File.Exists(tmpFile))
-        {
-            using var httpClient = new HttpClient();
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, ffmpegUrl);
-            var response = httpClient.Send(requestMessage);
-            response.EnsureSuccessStatusCode();
-
-            try
-            {
-                await using var fs = new FileStream(tmpFile, FileMode.Create, FileAccess.Write);
-                await response.Content.CopyToAsync(fs);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-            
-        }
-
-        var tmpExtractDir = Path.Combine(ffmpegDir, "tmp");
-        Directory.CreateDirectory(tmpExtractDir);
-        var tarCommand = $"tar -xf {tmpFile} -C {tmpExtractDir}";
-        await _commandExecute.RunCommand(tarCommand);
-
-        var extractedDir = Directory.GetDirectories(tmpExtractDir)[0];
-        foreach (var file in Directory.GetFiles(extractedDir))
-        {
-            var destFile = Path.Combine(ffmpegDir, Path.GetFileName(file));
-            File.Move(file, destFile, true);
-        }
-        
-        Directory.Delete(tmpExtractDir, true);
-        File.Delete(tmpFile);
-
-        return ffmpegDir;
+        return _ffMpeg.DownloadFfMpeg();
     }
 
-    public async Task<string> GetVideoTitle(string pathYtDlp, string urlVideo)
+    public string GetVideoTitle(string pathYtDlp, string urlVideo)
     {
-        var command = $"{pathYtDlp} --print title {urlVideo}";
-        var (output, _, exitCode)  = await _commandExecute.RunCommand(command);
+        // Adiciona aspas duplas ao redor da URL do vídeo
+        var quotedUrl = $"\"{urlVideo}\"";
+        var command = @$"{pathYtDlp} --print title {quotedUrl}";
+        var (output, _, exitCode) = _commandExecute.RunCommand(command);
 
         if (exitCode != 0)
             throw new Exception("Falha ao obter informações do vídeo");
@@ -102,7 +55,7 @@ public class YtDlp : IYtDlpService
             return output.Replace("\n", "");
         
         command = $"{_ytDlpPath} --dump-json {urlVideo}";
-        (output, _, _) = await _commandExecute.RunCommand(command);
+        (output, _, _) = _commandExecute.RunCommand(command);
 
         return output;
     }
