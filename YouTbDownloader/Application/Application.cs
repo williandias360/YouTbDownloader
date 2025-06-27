@@ -9,12 +9,14 @@ public partial class Application
 {
     private readonly IYtDlpService _ytDlpService;
     private readonly ICommandExecute _commandExecute;
+    private readonly IYtDlpSetupService _ytDlpSetupService;
     const string APP_NAME = "YouTbDownloader";
 
-    public Application(IYtDlpService ytDlpService, ICommandExecute commandExecute)
+    public Application(IYtDlpService ytDlpService, ICommandExecute commandExecute, IYtDlpSetupService ytDlpSetupService)
     {
         _ytDlpService = ytDlpService;
         _commandExecute = commandExecute;
+        _ytDlpSetupService = ytDlpSetupService;
     }
 
     public void Run()
@@ -23,7 +25,7 @@ public partial class Application
         {
             Console.WriteLine("Inicializando ambiente");
             var pathYtDlp = _ytDlpService.DownloadAndSetup();
-            var pathffmpeg = _ytDlpService.DownloadFfMgeg();
+            var pathffmpeg = _ytDlpSetupService.DownloadFfMgeg();
             var outputPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), APP_NAME);
 
             if (!Directory.Exists(outputPath))

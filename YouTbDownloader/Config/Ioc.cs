@@ -15,6 +15,8 @@ public class Ioc
             .AddTransient<Application>()
             .AddTransient<IYtDlpService, YtDlp>()
             .AddTransient<ICommandExecute, CommandExecute>()
+            .AddTransient<IYtDlpSetupService, YtDlpSetupService>()
+            .AddTransient<IYtDlpService, YtDlpService>()
             .AddTransient<IFFmpeg>((provider) =>
             {
                 var commandExecute = provider.GetRequiredService<ICommandExecute>();
